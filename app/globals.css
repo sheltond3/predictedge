@@ -2,37 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  background: #09090b;
-}
-
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #09090b;
-  color: white;
+html, body {
+  background: #09090b !important;
+  color: white !important;
 }
 
 .glass {
-  background: rgba(9, 9, 11, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(234, 179, 8, 0.2);
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  background: rgba(9, 9, 11, 0.98) !important;
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(234, 179, 8, 0.25);
 }
 
-.neon-red { 
-  text-shadow: 0 0 15px #ef4444, 0 0 30px #ef4444, 0 0 60px #ef4444; 
-}
-.neon-blue { 
-  text-shadow: 0 0 15px #3b82f6, 0 0 30px #3b82f6, 0 0 60px #3b82f6; 
-}
-.neon-yellow {
-  text-shadow: 0 0 15px #eab308, 0 0 30px #eab308;
-}
-
-.gauge-container {
-  filter: drop-shadow(0 0 40px rgb(234 179 8 / 0.4));
-}
-
-.map-state:hover {
-  filter: brightness(1.4) drop-shadow(0 0 15px #eab308);
-}
+.neon-red { text-shadow: 0 0 20px #ef4444, 0 0 40px #ef4444, 0 0 80px #ef4444; }
+.neon-blue { text-shadow: 0 0 20px #3b82f6, 0 0 40px #3b82f6; }
+.neon-yellow { text-shadow: 0 0 20px #eab308, 0 0 40px #eab308; }
