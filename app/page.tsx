@@ -4,13 +4,21 @@ import MarketGauge from './components/MarketGauge';
 import CandidateCard from './components/CandidateCard';
 import AffiliateBanner from './components/AffiliateBanner';
 
+interface PolymarketMarket {
+  slug: string;
+  title: string;
+  volume: number;
+  tags?: string[];
+  tokens?: Array<{ price: number }>;
+}
+
 async function getPolymarketMarkets() {
   const res = await fetch('https://gamma-api.polymarket.com/markets?active=true&closed=false&limit=50&order=volume', {
     next: { revalidate: 60 },
   });
-  const data = await res.json();
+  const data: PolymarketMarket[] = await res.json();
   
-  const politics = data.filter((m: any) => 
+  const politics = data.filter((m: PolymarketMarket) => 
     m.tags?.some((t: string) => 
       ['politics', 'election', 'senate', 'president', '2026', '2028'].includes(t.toLowerCase())
     ) && m.volume > 100_000
@@ -21,7 +29,7 @@ async function getPolymarketMarkets() {
 
 export default async function Home() {
   const markets = await getPolymarketMarkets();
-  const senateMarket = markets.find((m: any) => 
+  const senateMarket = markets.find((m: PolymarketMarket) => 
     m.slug.includes('senate') || m.title.toLowerCase().includes('senate')
   ) || markets[0];
 

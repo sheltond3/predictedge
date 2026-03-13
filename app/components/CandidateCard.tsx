@@ -19,12 +19,8 @@ export default function CandidateCard({ name, prob, volume, spark, color }: { na
           </ResponsiveContainer>
         </div>
       </div>
-      <div className="text-sm text-zinc-400 mb-6">Volume: ${volume}</div>
-      <a 
-        href="https://polymarket.com?ref=YOUR_AFFILIATE_ID_HERE" 
-        target="_blank"
-        className="block w-full bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all group-hover:scale-105"
-      >
+      <div className="text-sm text-zinc-400 mb-6">Volume: \${volume}</div>
+      <a href="https://polymarket.com?ref=YOUR_AFFILIATE_ID_HERE" target="_blank" className="block w-full bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all group-hover:scale-105">
         Trade Now on Polymarket <ExternalLink className="w-4 h-4" />
       </a>
     </div>

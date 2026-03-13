@@ -3,7 +3,6 @@ import { RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis } from '
 
 export default function MarketGauge({ title, yesProb, noProb, volume }: { title: string; yesProb: number; noProb: number; volume: number }) {
   const data = [{ name: 'REP', value: yesProb, fill: '#ef4444' }];
-  
   return (
     <div className="bg-zinc-900 rounded-3xl p-10 border border-zinc-800">
       <div className="text-2xl font-bold mb-8 text-center">{title}</div>
@@ -30,7 +29,7 @@ export default function MarketGauge({ title, yesProb, noProb, volume }: { title:
         </div>
       </div>
       <div className="text-center mt-8 text-2xl font-mono text-green-400">
-        Volume: ${Number(volume).toLocaleString()}
+        Volume: \${Number(volume).toLocaleString()}
       </div>
     </div>
   );
