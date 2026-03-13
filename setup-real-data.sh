@@ -1,3 +1,10 @@
+#!/bin/bash
+echo "=== PredictEdge BATCH 3: Real Dynamic 2028 Data (Dark/Neon preserved) ==="
+echo "Folder: $(pwd)"
+read -p "Press Enter to start (Ctrl+C anytime)..."
+
+echo "=== Step 1: Upgrading page.tsx for live 2028 parsing ==="
+cat > app/page.tsx << 'EOL'
 import { format } from 'date-fns';
 import { TrendingUp, Users } from 'lucide-react';
 import MarketGauge from './components/MarketGauge';
@@ -120,3 +127,15 @@ export default async function Home() {
     </div>
   );
 }
+EOL
+echo "✓ Live 2028 parsing added (dark/neon preserved)"
+read -p "Press Enter to commit & push..."
+
+echo "=== Step 2: Commit & push ==="
+git add .
+git commit -m "feat: real dynamic 2028 candidates from live Polymarket (dark theme locked)"
+git push
+echo "=== BATCH 3 COMPLETE! ==="
+echo "Go to Vercel dashboard → Redeploy (or it auto-triggers)."
+echo "Your site now shows REAL top contenders with live % and volumes — exactly like the big $397M market."
+echo "Reply with your live Vercel URL and say “Next batch” for the interactive US Map upgrade + affiliate config."
