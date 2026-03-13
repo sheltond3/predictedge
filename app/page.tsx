@@ -3,6 +3,7 @@ import { TrendingUp, Users } from 'lucide-react';
 import MarketGauge from './components/MarketGauge';
 import CandidateCard from './components/CandidateCard';
 import AffiliateBanner from './components/AffiliateBanner';
+import USMap from './components/USMap';
 
 interface PolymarketMarket {
   slug: string;
@@ -17,13 +18,9 @@ async function getPolymarketMarkets() {
     next: { revalidate: 60 },
   });
   const data: PolymarketMarket[] = await res.json();
-  
   const politics = data.filter((m: PolymarketMarket) => 
-    m.tags?.some((t: string) => 
-      ['politics', 'election', 'senate', 'president', '2026', '2028'].includes(t.toLowerCase())
-    ) && m.volume > 100_000
+    m.tags?.some((t: string) => ['politics','election','senate','president','2026','2028'].includes(t.toLowerCase())) && m.volume > 100_000
   );
-
   return politics.slice(0, 12);
 }
 
@@ -33,7 +30,6 @@ export default async function Home() {
     m.slug.includes('senate') || m.title.toLowerCase().includes('senate')
   ) || markets[0];
 
-  // ✅ FIXED: Safe nullish coalescing so TS never sees "undefined"
   const yesProb = (senateMarket?.tokens?.[0]?.price ?? 0.53) * 100;
   const noProb = (senateMarket?.tokens?.[1]?.price ?? 0.47) * 100;
   const volume = senateMarket?.volume ?? 0;
@@ -49,6 +45,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-950">
+      {/* Navbar & Ticker same as before */}
       <nav className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -60,7 +57,7 @@ export default async function Home() {
             <a href="#" className="hover:text-white">All Markets</a>
             <a href="#affiliates" className="hover:text-white">Affiliates</a>
           </div>
-          <div className="text-xs text-zinc-500">Data from Polymarket • Updates every 60s</div>
+          <div className="text-xs text-zinc-500">Live from Polymarket</div>
         </div>
       </nav>
 
@@ -71,41 +68,33 @@ export default async function Home() {
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold tracking-tighter mb-4">Real-Time Prediction Markets</h1>
-          <p className="text-2xl text-zinc-400 max-w-2xl mx-auto">Better visuals. Better odds. Earn when you trade.</p>
+          <h1 className="text-7xl font-bold tracking-tighter mb-4">Real-Time Prediction Markets</h1>
+          <p className="text-3xl text-zinc-400">Better visuals. Better odds. Earn when you trade.</p>
         </div>
 
+        {/* Senate Section with gauges + map */}
         <div className="mb-20">
           <div className="flex items-center gap-3 mb-8">
             <Users className="w-8 h-8 text-yellow-400" />
-            <h2 className="text-4xl font-bold">Senate Control 2026</h2>
+            <h2 className="text-5xl font-bold">Senate Control 2026</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {senateMarket ? (
-              <MarketGauge 
-                title={senateMarket.title}
-                yesProb={yesProb}
-                noProb={noProb}
-                volume={volume}
-              />
-            ) : (
-              <div className="text-center py-20 text-zinc-500">Loading Senate market...</div>
-            )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <MarketGauge title={senateMarket?.title || "Senate Control"} yesProb={yesProb} noProb={noProb} volume={volume} />
+            <USMap />
           </div>
         </div>
 
+        {/* Top Candidates — matches preview */}
         <div>
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <TrendingUp className="w-8 h-8 text-yellow-400" />
-              <h2 className="text-4xl font-bold">Top 2028 Presidential Contenders</h2>
+              <h2 className="text-5xl font-bold">Top 2028 Presidential Contenders</h2>
             </div>
             <div className="text-sm text-zinc-500">Data refreshed live</div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {topCandidates.map((c, i) => (
-              <CandidateCard key={i} {...c} />
-            ))}
+            {topCandidates.map((c, i) => <CandidateCard key={i} {...c} />)}
           </div>
         </div>
       </div>
