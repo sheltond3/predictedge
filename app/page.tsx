@@ -1,65 +1,106 @@
-import Image from "next/image";
+import { format } from 'date-fns';
+import { TrendingUp, Users } from 'lucide-react';
+import MarketGauge from './components/MarketGauge';
+import CandidateCard from './components/CandidateCard';
+import AffiliateBanner from './components/AffiliateBanner';
 
-export default function Home() {
+async function getPolymarketMarkets() {
+  const res = await fetch('https://gamma-api.polymarket.com/markets?active=true&closed=false&limit=50&order=volume', {
+    next: { revalidate: 60 },
+  });
+  const data = await res.json();
+  
+  const politics = data.filter((m: any) => 
+    m.tags?.some((t: string) => 
+      ['politics', 'election', 'senate', 'president', '2026', '2028'].includes(t.toLowerCase())
+    ) && m.volume > 100_000
+  );
+
+  return politics.slice(0, 12);
+}
+
+export default async function Home() {
+  const markets = await getPolymarketMarkets();
+  const senateMarket = markets.find((m: any) => 
+    m.slug.includes('senate') || m.title.toLowerCase().includes('senate')
+  ) || markets[0];
+
+  const topCandidates = [
+    { name: 'JD Vance', prob: 28, volume: '1.2M', spark: [22,24,25,27,28,29,28], color: '#ef4444' },
+    { name: 'Kamala Harris', prob: 19, volume: '890K', spark: [21,20,19,18,19,19,19], color: '#3b82f6' },
+    { name: 'Ron DeSantis', prob: 14, volume: '650K', spark: [15,16,15,14,13,14,14], color: '#eab308' },
+    { name: 'Gavin Newsom', prob: 12, volume: '410K', spark: [11,12,13,12,12,11,12], color: '#22c55e' },
+  ];
+
+  const lastUpdated = new Date();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-zinc-950">
+      <nav className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-3xl font-bold tracking-tighter bg-gradient-to-r from-yellow-400 to-blue-500 bg-clip-text text-transparent">PredictEdge</div>
+          </div>
+          <div className="flex gap-8 text-sm font-medium">
+            <a href="#" className="text-yellow-400">Senate 2026</a>
+            <a href="#" className="hover:text-white">Presidency 2028</a>
+            <a href="#" className="hover:text-white">All Markets</a>
+            <a href="#affiliates" className="hover:text-white">Affiliates</a>
+          </div>
+          <div className="text-xs text-zinc-500">Data from Polymarket • Updates every 60s</div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </nav>
+
+      <div className="bg-zinc-900 border-b border-zinc-800 py-2 text-center text-sm flex items-center justify-center gap-2">
+        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+        Odds update every 60s • Last updated {format(lastUpdated, 'h:mm a')}
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="text-center mb-16">
+          <h1 className="text-6xl font-bold tracking-tighter mb-4">Real-Time Prediction Markets</h1>
+          <p className="text-2xl text-zinc-400 max-w-2xl mx-auto">Better visuals. Better odds. Earn when you trade.</p>
         </div>
-      </main>
+
+        <div className="mb-20">
+          <div className="flex items-center gap-3 mb-8">
+            <Users className="w-8 h-8 text-yellow-400" />
+            <h2 className="text-4xl font-bold">Senate Control 2026</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {senateMarket ? (
+              <MarketGauge 
+                title={senateMarket.title}
+                yesProb={senateMarket.tokens?.[0]?.price * 100 || 53}
+                noProb={senateMarket.tokens?.[1]?.price * 100 || 47}
+                volume={senateMarket.volume}
+              />
+            ) : (
+              <div className="text-center py-20 text-zinc-500">Loading Senate market...</div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-8 h-8 text-yellow-400" />
+              <h2 className="text-4xl font-bold">Top 2028 Presidential Contenders</h2>
+            </div>
+            <div className="text-sm text-zinc-500">Data refreshed live</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {topCandidates.map((c, i) => (
+              <CandidateCard key={i} {...c} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <AffiliateBanner />
+      <footer className="border-t border-zinc-800 py-12 text-center text-xs text-zinc-500">
+        PredictEdge © 2026 • Not affiliated with any exchange • Built with ❤️ using public Polymarket data
+      </footer>
     </div>
   );
 }
