@@ -1,8 +1,15 @@
 'use client';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 
-export default function CandidateCard({ name, prob, volume, spark, color }: { name: string; prob: number; volume: string; spark: number[]; color: string }) {
+export default function CandidateCard({ name, prob, volume, spark, color }: { 
+  name: string; 
+  prob: number; 
+  volume: string; 
+  spark: number[]; 
+  color: string 
+}) {
   const photoMap: Record<string, string> = {
     'JD Vance': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/JD_Vance_official_portrait.jpg/400px-JD_Vance_official_portrait.jpg',
     'Kamala Harris': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Kamala_Harris_official_VP_portrait.jpg/400px-Kamala_Harris_official_VP_portrait.jpg',
@@ -12,7 +19,15 @@ export default function CandidateCard({ name, prob, volume, spark, color }: { na
 
   return (
     <div className="glass rounded-3xl p-8 border border-zinc-700 hover:border-yellow-400 transition-all group overflow-hidden">
-      <img src={photoMap[name] || ''} alt={name} className="w-20 h-20 rounded-2xl mx-auto mb-4 object-cover shadow-2xl" />
+      <div className="relative w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden shadow-2xl">
+        <Image 
+          src={photoMap[name] || ''} 
+          alt={name} 
+          fill 
+          className="object-cover" 
+          sizes="80px"
+        />
+      </div>
       <div className="text-3xl font-bold text-center mb-1">{name}</div>
       <div className="text-6xl font-mono text-yellow-400 text-center mb-6">{prob}%</div>
       

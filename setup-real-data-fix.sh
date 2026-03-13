@@ -1,3 +1,81 @@
+#!/bin/bash
+echo "=== PredictEdge — Fix Build + Real 2028 Data (Dark/Neon Locked) ==="
+echo "Folder: $(pwd)"
+read -p "Press Enter to apply the fix (Ctrl+C to stop)..."
+
+echo "=== Step 1: Adding Next.js Image config ==="
+cat > next.config.mjs << 'EOL'
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+      },
+    ],
+  },
+};
+export default nextConfig;
+EOL
+echo "✓ next.config.mjs updated"
+
+echo "=== Step 2: Fixing CandidateCard with Next/Image ==="
+cat > app/components/CandidateCard.tsx << 'EOL'
+'use client';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { ExternalLink } from 'lucide-react';
+import Image from 'next/image';
+
+export default function CandidateCard({ name, prob, volume, spark, color }: { 
+  name: string; 
+  prob: number; 
+  volume: string; 
+  spark: number[]; 
+  color: string 
+}) {
+  const photoMap: Record<string, string> = {
+    'JD Vance': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/JD_Vance_official_portrait.jpg/400px-JD_Vance_official_portrait.jpg',
+    'Kamala Harris': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Kamala_Harris_official_VP_portrait.jpg/400px-Kamala_Harris_official_VP_portrait.jpg',
+    'Ron DeSantis': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Ron_DeSantis_official_portrait.jpg/400px-Ron_DeSantis_official_portrait.jpg',
+    'Gavin Newsom': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Gavin_Newsom_official_photo.jpg/400px-Gavin_Newsom_official_photo.jpg',
+  };
+
+  return (
+    <div className="glass rounded-3xl p-8 border border-zinc-700 hover:border-yellow-400 transition-all group overflow-hidden">
+      <div className="relative w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden shadow-2xl">
+        <Image 
+          src={photoMap[name] || ''} 
+          alt={name} 
+          fill 
+          className="object-cover" 
+          sizes="80px"
+        />
+      </div>
+      <div className="text-3xl font-bold text-center mb-1">{name}</div>
+      <div className="text-6xl font-mono text-yellow-400 text-center mb-6">{prob}%</div>
+      
+      <div className="text-xs text-zinc-400 text-center mb-2">7-DAY MOMENTUM</div>
+      <ResponsiveContainer width="100%" height={60}>
+        <LineChart data={spark.map((v, i) => ({ day: i, val: v }))}>
+          <Line type="natural" dataKey="val" stroke={color} strokeWidth={4} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+
+      <div className="text-sm text-green-400 text-center mt-4">Volume: ${volume}</div>
+
+      <a href="https://polymarket.com?ref=YOUR_AFFILIATE_ID_HERE" target="_blank" 
+         className="block mt-6 w-full bg-gradient-to-r from-yellow-400 to-amber-400 hover:brightness-110 text-zinc-950 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all group-hover:scale-105">
+        Trade Now <ExternalLink className="w-4 h-4" />
+      </a>
+    </div>
+  );
+}
+EOL
+echo "✓ CandidateCard fixed (no more img warning)"
+
+echo "=== Step 3: Fixing page.tsx with proper types (no any) ==="
+cat > app/page.tsx << 'EOL'
 import { format } from 'date-fns';
 import { TrendingUp, Users } from 'lucide-react';
 import MarketGauge from './components/MarketGauge';
@@ -123,3 +201,13 @@ export default async function Home() {
     </div>
   );
 }
+EOL
+echo "✓ page.tsx fully typed (no more any errors)"
+
+echo "=== Step 4: Commit & push ==="
+git add .
+git commit -m "fix: build errors resolved + live 2028 data (dark/neon theme preserved)"
+git push
+echo "=== ALL FIXED! ==="
+echo "Go to Vercel → Redeploy (or wait for auto-deploy)."
+echo "Your site now shows REAL live 2028 candidates with real % and volumes."
