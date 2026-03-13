@@ -33,6 +33,11 @@ export default async function Home() {
     m.slug.includes('senate') || m.title.toLowerCase().includes('senate')
   ) || markets[0];
 
+  // ✅ FIXED: Safe nullish coalescing so TS never sees "undefined"
+  const yesProb = (senateMarket?.tokens?.[0]?.price ?? 0.53) * 100;
+  const noProb = (senateMarket?.tokens?.[1]?.price ?? 0.47) * 100;
+  const volume = senateMarket?.volume ?? 0;
+
   const topCandidates = [
     { name: 'JD Vance', prob: 28, volume: '1.2M', spark: [22,24,25,27,28,29,28], color: '#ef4444' },
     { name: 'Kamala Harris', prob: 19, volume: '890K', spark: [21,20,19,18,19,19,19], color: '#3b82f6' },
@@ -79,9 +84,9 @@ export default async function Home() {
             {senateMarket ? (
               <MarketGauge 
                 title={senateMarket.title}
-                yesProb={senateMarket.tokens?.[0]?.price * 100 || 53}
-                noProb={senateMarket.tokens?.[1]?.price * 100 || 47}
-                volume={senateMarket.volume}
+                yesProb={yesProb}
+                noProb={noProb}
+                volume={volume}
               />
             ) : (
               <div className="text-center py-20 text-zinc-500">Loading Senate market...</div>
